@@ -41,32 +41,32 @@ var Route = function(path){
  * key names. For example "/user/:id" will
  * then contain ["id"].
  *
- * @param  {String} path
+ * @param  {String} url
  * @param  {Array} keys
  * @return {RegExp}
  */
-var pathToRegExp = function (path, keys) {
-	path = path
-		.concat('/?')
-		.replace(/\/\(/g, '(?:/')
-		.replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?|\*/g, function(_, slash, format, key, capture, optional){
-			if (_ === "*"){
-				keys.push(undefined);
-				return _;
-			}
+var pathToRegExp = function (url, keys) {
+  url = url.replace(/\//g, '\\/') // '/' => '\/'
+  .replace(/\./g, '\\.?') // '.' => '\.?'
+  .replace(/\*/g, '.+'); // '*' => '.+'
 
-			keys.push(key);
-			slash = slash || '';
-			return ''
-				+ (optional ? '' : slash)
-				+ '(?:'
-				+ (optional ? slash : '')
-				+ (format || '') + (capture || '([^/]+?)') + ')'
-				+ (optional || '');
-		})
-		.replace(/([\/.])/g, '\\$1')
-		.replace(/\*/g, '(.*)');
-	return new RegExp('^' + path + '$', 'i');
+  // ':id' => ([^\/]+), 
+  // ':id?' => ([^\/]*), 
+  // ':id([0-9]+)' => ([0-9]+)+, 
+  // ':id([0-9]+)?' => ([0-9]+)* 
+  url = url.replace(/:(\w+)(?:\(([^\)]+)\))?(\?)?/g, function (all, name, rex, atLeastOne) {
+    keys.push(name);
+    if (!rex) {
+      rex = '[^\\/]' + (atLeastOne === '?' ? '*' : '+');
+    }
+    return '(' + rex + ')';
+  });
+  // /user/:id => /user, /user/123
+  url = url.replace(/\\\/\(\[\^\\\/\]\*\)/g, '(?:\\/(\\w*))?');
+  this.keys = keys;
+  var re = '^' + url;
+  re += '.*$';
+  return new RegExp( url, 'i');
 };
 
 /**
