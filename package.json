@@ -1,0 +1,20 @@
+{
+  "name": "routes-all",
+  "description": "fork from https://github.com/aaronblohowiak/routes.js, add all match",
+  "version": "0.0.1",
+  "author": {
+    "name": "PerterPon",
+    "email": "PerterPon@gmail.com",
+    "url": "http://github.com/PerterPon"
+  },
+  "main": "dist/routes",
+  "scripts": {
+    "test": "make test"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "devDependencies": {
+    "browserify": "^3.30.4"
+  }
+}
